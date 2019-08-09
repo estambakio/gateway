@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// NewProxy returns reverse proxy which maps path to backendURL
+// NewProxy returns http.Handler which maps path to backendURL
 func NewProxy(path, backendURL string) (http.Handler, error) {
 	target, err := url.ParseRequestURI(backendURL)
 	if err != nil {

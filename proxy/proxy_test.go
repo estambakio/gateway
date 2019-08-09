@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 )
 
@@ -18,7 +17,7 @@ import (
 func Test_NewProxy(t *testing.T) {
 	// backend server responds with its request URI to indicate what request it has received
 	backendServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, r.URL.RequestURI())
+		fmt.Fprint(w, r.URL.RequestURI())
 	}))
 	defer backendServer.Close()
 
@@ -62,10 +61,10 @@ func Test_NewProxy(t *testing.T) {
 			t.Error(err)
 		}
 
-		result := strings.TrimSpace(string(b)) // remove EOL
+		result := string(b)
 
 		if result != test.expectedBackendReqURI {
-			t.Errorf("b: %s, but expected %s", string(b), test.expectedBackendReqURI)
+			t.Errorf("b: %s, but expected %s", result, test.expectedBackendReqURI)
 		}
 	}
 

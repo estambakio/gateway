@@ -9,6 +9,7 @@ import (
 
 func main() {
 	mapping := map[string]string{
+		// how to run example:
 		// go run main.go
 		// curl -v http://localhost:3000/task/1 - see JSON with id = 1
 		"/task/": "https://jsonplaceholder.typicode.com/todos/",
@@ -19,6 +20,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+		// register proxy handler for every path
 		http.Handle(from, handler)
 	}
 
