@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/estambakio/proxy/pkg/proxy"
+	"github.com/estambakio/gateway/pkg/proxy"
 )
 
 func main() {

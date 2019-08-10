@@ -1,1 +1,1 @@
-module github.com/estambakio/proxy
+module github.com/estambakio/gateway
