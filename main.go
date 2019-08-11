@@ -45,7 +45,7 @@ func main() {
 			panic(err)
 		}
 		// register proxy handler for every path
-		// triyng to set the same From will cause panic
+		// trying to set the same path (cfg.From) as already existing will cause panic
 		http.Handle(cfg.From, handler)
 	}
 
