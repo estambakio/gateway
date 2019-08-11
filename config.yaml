@@ -1,0 +1,6 @@
+# how to run example:
+# go run main.go
+# curl -v http://localhost:3000/task/1 - see JSON with id = 1
+rules:
+  - from: "/task/"
+    to: "https://jsonplaceholder.typicode.com/todos/"

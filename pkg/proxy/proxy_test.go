@@ -40,32 +40,52 @@ func Test_NewProxy(t *testing.T) {
 		{"/myapp", "/some_path", "/myapp/info.html", "/some_path/info.html"},
 	}
 
-	for i, test := range tests {
-		proxy, err := NewProxy(test.proxyPath, backendServer.URL+test.backendBaseURI)
-		if err != nil {
-			t.Errorf("%d: failed to setup test proxy: %v", i, err)
-		}
+	for _, test := range tests {
+		t.Run(test.proxyPath, func(t *testing.T) {
+			proxy, err := NewProxy(test.proxyPath, backendServer.URL+test.backendBaseURI)
+			if err != nil {
+				t.Errorf("failed to create test proxy: %v", err)
+			}
 
-		frontendProxy := httptest.NewServer(proxy)
-		defer frontendProxy.Close()
+			// test both http and https proxy
+			frontends := []struct {
+				schema string
+				server *httptest.Server
+			}{
+				{schema: "http", server: httptest.NewServer(proxy)},
+				{schema: "https", server: httptest.NewTLSServer(proxy)},
+			}
 
-		// TODO test also other request methods (POST etc.)
-		resp, err := http.Get(frontendProxy.URL + test.requestURI)
-		if err != nil {
-			t.Errorf("%d: failed to get %s: %v", i, frontendProxy.URL+test.requestURI, err)
-		}
-		defer resp.Body.Close()
+			for _, frontend := range frontends {
+				t.Run(frontend.schema, func(t *testing.T) {
+					frontendProxy := frontend.server
+					defer frontendProxy.Close()
 
-		b, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			t.Error(err)
-		}
+					// this is required for TLS test server to not fail on certificates
+					// for http server http.Get will do, but this approach handle both test cases
+					client := frontendProxy.Client()
 
-		result := string(b)
+					// TODO test also other request methods (POST etc.)
+					resp, err := client.Get(frontendProxy.URL + test.requestURI)
+					if err != nil {
+						t.Errorf("failed to get %s: %v", frontendProxy.URL+test.requestURI, err)
+					}
+					defer resp.Body.Close()
 
-		if result != test.expectedBackendReqURI {
-			t.Errorf("b: %s, but expected %s", result, test.expectedBackendReqURI)
-		}
+					b, err := ioutil.ReadAll(resp.Body)
+					if err != nil {
+						t.Error(err)
+					}
+
+					result := string(b)
+
+					if result != test.expectedBackendReqURI {
+						t.Errorf("b: %s, but expected %s", result, test.expectedBackendReqURI)
+					}
+				})
+			}
+
+		})
 	}
 
 	// should fail if passed invalid url as backend
