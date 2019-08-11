@@ -62,7 +62,7 @@ func Test_NewProxy(t *testing.T) {
 					defer frontendProxy.Close()
 
 					// this is required for TLS test server to not fail on certificates
-					// for http server http.Get will do, but this approach handle both test cases
+					// for http server http.Get will do, but this approach handles both test cases
 					client := frontendProxy.Client()
 
 					// TODO test also other request methods (POST etc.)
