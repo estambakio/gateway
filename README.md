@@ -1,5 +1,8 @@
 [![CircleCI](https://circleci.com/gh/estambakio/gateway.svg?style=shield)](https://circleci.com/gh/estambakio/gateway)
 [![Go Report Card](https://goreportcard.com/badge/github.com/estambakio/gateway)](https://goreportcard.com/report/github.com/estambakio/gateway)
+[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/estambakio/gateway)](https://cloud.docker.com/repository/docker/estambakio/gateway)
+[![MicroBadger Size (tag)](https://img.shields.io/microbadger/image-size/estambakio/gateway/master)](https://cloud.docker.com/repository/docker/estambakio/gateway)
+[![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/estambakio/gateway)](https://cloud.docker.com/repository/docker/estambakio/gateway)
 [![license](https://img.shields.io/github/license/estambakio/gateway.svg?style=flat-square)](LICENSE)
 
 # gateway
