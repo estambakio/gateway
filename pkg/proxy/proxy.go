@@ -6,8 +6,8 @@ import (
 	"net/url"
 )
 
-// NewProxy returns http.Handler which maps source path on proxy to backend URL
-func NewProxy(from, to string) (http.Handler, error) {
+// New returns http.Handler which maps source path on proxy to backend URL
+func New(from, to string) (http.Handler, error) {
 	target, err := url.ParseRequestURI(to)
 	if err != nil {
 		return nil, err

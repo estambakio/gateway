@@ -4,4 +4,39 @@
 
 # gateway
 
+## Usage
+
+Create config with proxy rules:
+
+```
+rules:
+  - from: "/task/"
+    to: "https://jsonplaceholder.typicode.com/todos/"
+```
+
+Starts gateway with this config on your local machine on port 3000:
+
+```
+docker run -it -p 3000:3000 \
+  -v /path/to/config.yaml:/config.yaml \
+  estambakio/gateway:master \
+    --config /config.yaml
+```
+
+Open terminal and make a request:
+
+```
+curl -v http://localhost:3000/task/1
+```
+
+This will respond with content from `https://jsonplaceholder.typicode.com/todos/1`
+
+### Args
+- `-c or --config` - path to config file, **required**
+
+### Environment variables
+- `PORT` - port to start server on, 3000 by default
+
+## Development
+
 `go test -v -cover ./...`

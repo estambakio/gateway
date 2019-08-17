@@ -14,7 +14,7 @@ import (
 // /app2 http://app2
 // - req to proxy: /app2/something
 // - backend req: http://app2/something
-func Test_NewProxy(t *testing.T) {
+func Test_New(t *testing.T) {
 	// backend server responds with its request URI to indicate what request it has received
 	backendServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, r.URL.RequestURI())
@@ -27,8 +27,8 @@ func Test_NewProxy(t *testing.T) {
 		// then it means that all requests to http://proxy.com/myapp/some_page.html are routed to
 		// http://backend_domain.com/some_backend_path/some_page.html
 		// backend_domain.com here is known in tests because it's set up earlier;
-		// function NewProxy receives full URL to backend, for example in our case:
-		// proxy, err := NewProxy("/myapp", "http://backend_domain.com/some_backend_path")
+		// function New receives full URL to backend, for example in our case:
+		// proxy, err := New("/myapp", "http://backend_domain.com/some_backend_path")
 		proxyPath             string
 		backendBaseURI        string
 		requestURI            string
@@ -42,7 +42,7 @@ func Test_NewProxy(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.proxyPath, func(t *testing.T) {
-			proxy, err := NewProxy(test.proxyPath, backendServer.URL+test.backendBaseURI)
+			proxy, err := New(test.proxyPath, backendServer.URL+test.backendBaseURI)
 			if err != nil {
 				t.Errorf("failed to create test proxy: %v", err)
 			}
@@ -89,7 +89,7 @@ func Test_NewProxy(t *testing.T) {
 	}
 
 	// should fail if passed invalid url as backend
-	_, err := NewProxy("/app", "1234")
+	_, err := New("/app", "1234")
 	if err == nil {
 		t.Errorf("did not fail for invalid backend url")
 	}

@@ -5,4 +5,6 @@ jobs:
       - image: golang
     steps:
       - checkout
-      - run: make test
+      - run:
+          name: Run tests and build a binary
+          command: make build

@@ -5,8 +5,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/estambakio/gateway/pkg/proxy"
+	flags "github.com/jessevdk/go-flags"
 	"github.com/spf13/viper"
 )
 
@@ -19,10 +21,46 @@ type rule struct {
 	To   string `mapstructure:"to"`
 }
 
+func dynamicProxyHandler(rules []rule) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for _, rule := range rules {
+			if strings.HasPrefix(r.URL.Path, rule.From) {
+				handler, err := proxy.New(rule.From, rule.To)
+				if err != nil {
+					http.Error(w, "failed to proxy request", http.StatusInternalServerError)
+					return
+				}
+				handler.ServeHTTP(w, r)
+				return
+			}
+		}
+		// if request doesn't match any rule.From then serve 404 error
+		http.NotFound(w, r)
+	})
+}
+
+// command-line options
+var opts struct {
+	Config string `short:"c" long:"config" description:"Path to config.yaml" required:"true"`
+}
+
 func main() {
-	viper.SetConfigName("config")
+	parser := flags.NewParser(&opts, flags.Default)
+	_, err := parser.Parse()
+	if err != nil {
+		flagsErr, ok := err.(*flags.Error)
+		if ok && flagsErr.Type == flags.ErrHelp {
+			os.Exit(0)
+		} else if ok && flagsErr.Type == flags.ErrCommandRequired {
+			parser.WriteHelp(os.Stdout)
+			os.Exit(1)
+		} else {
+			os.Exit(1)
+		}
+	}
+
+	viper.SetConfigFile(opts.Config)
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -34,22 +72,12 @@ func main() {
 
 	var C config
 
-	err := viper.Unmarshal(&C)
+	err = viper.Unmarshal(&C)
 	if err != nil {
 		panic(fmt.Errorf("unable to decode into struct, %v", err))
 	}
 
-	for _, cfg := range C.Rules {
-		handler, err := proxy.NewProxy(cfg.From, cfg.To)
-		if err != nil {
-			panic(err)
-		}
-		// register proxy handler for every path
-		// trying to set the same path (cfg.From) as already existing will cause panic
-		http.Handle(cfg.From, handler)
-	}
-
-	log.Fatal(http.ListenAndServe(":"+port(), nil))
+	log.Fatal(http.ListenAndServe(":"+port(), dynamicProxyHandler(C.Rules)))
 }
 
 func port() string {
