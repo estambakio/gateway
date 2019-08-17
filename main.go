@@ -61,6 +61,7 @@ func main() {
 
 	viper.SetConfigFile(opts.Config)
 	viper.SetConfigType("yaml")
+	viper.WatchConfig()
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
