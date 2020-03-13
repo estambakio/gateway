@@ -7,6 +7,10 @@
 
 # gateway
 
+## State
+
+Paused. Primary use case (handling 'maintenance' case in Kubernetes cluster when admins have access to all regular ingress routes while other users receive 'maintenance in progress' page) can be solved via built-in functionality in SSO tool, e.g. Keycloak.
+
 ## Usage
 
 Create config with proxy rules:
